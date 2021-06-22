@@ -38,12 +38,16 @@ usersRouter.post('/', async (request, response) => {
 // utilizamos o patch por estar querendo atualizar uma info unica, como avatar e senha
 usersRouter.patch('/avatar', ensureAuthenticated, upload.single('avatar'), async (request, response) => {
     try {
-        const updateUserService = new UpdateUserAvatarService();
+        const updateUserAvatar = new UpdateUserAvatarService();
 
-        const updateUser = await updateUserService.execute({
+        console.log(request.file)
+
+        const user = await updateUserAvatar.execute({
             user_id: request.user.id,
-            filename: request.file.filename,
+            avatarFilename: request.file.filename,
         });
+
+        return response.json(user);
 
     } catch (error) {
         return response.status(400).json({ message: error.message })    

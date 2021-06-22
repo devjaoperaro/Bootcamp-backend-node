@@ -9,18 +9,16 @@ import uploadConfig from '../config/upload';
 
 interface Request{
     user_id: string;
-    filename: string;
+    avatarFilename: string;
 }
 
 class UpdateUserAvatarService {
-    public async execute({user_id, filename}: Request): Promise<void>{
+    public async execute({user_id, avatarFilename}: Request): Promise<User | undefined>{
 
         const repository = getRepository(User);
 
-        const user = await repository.findOne({
-            where: { user_id: user_id }
-        });
-
+        const user = await repository.findOne(user_id);
+        
         if(!user){
             throw new Error('User no exist');
         }
@@ -37,9 +35,14 @@ class UpdateUserAvatarService {
                 // apaga o arquivo
                 await fs.promises.unlink(userAvatarFilePath);
             }
-            // salvar
-
         }
+
+        // salvar
+        user.avatar = avatarFilename;
+
+        await repository.save(user);
+
+        return user;
     }
 }
 
